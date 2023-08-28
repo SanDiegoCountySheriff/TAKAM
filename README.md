@@ -1,4 +1,4 @@
-# TAKAM SSO Portal
+# TAKAM SSO Portalx
 
 **Team Awareness Kit (TAK)**
 > "TAK is a smart device geospatial infrastructure and situational awareness app. It allows for precision targeting, surrounding land formation intelligence, situational awareness, navigation, and data sharing. It enables users to navigate using GPS and provides geospatial map data overlayed with real-time situational awareness of ongoing events. 
