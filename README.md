@@ -24,7 +24,7 @@ The TAKAM solution is designed to accomodate a TAK server instance that has alre
    - Agency and group level administrators may create groups on the TAK server and select which accounts are allowed to assign their server packages to those groups.
    - Agency administrator may create event groups and server packages to share with external agencies they wish to onboard onto their TAK server.
 9. Single Sign On (SSO) with AAD of your choice.
-10. Responsive design that adjust to fit almost any device type or size.
+10. Responsive design that adjusts to fit almost any device type or size.
 11. Razor pages allow dynamic rendering of front-end elements by app roles or other user properties captured in the SQL database or storage account.
 12. [Shoelace](https://shoelace.style/) web component library allows use of a rich library of modern and free front-end user interface components.
 
