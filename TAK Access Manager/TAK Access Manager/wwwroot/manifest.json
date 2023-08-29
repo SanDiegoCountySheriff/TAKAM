@@ -1,0 +1,22 @@
+{
+  "name": "My Sample PWA",
+  "lang": "en-us",
+  "short_name": "SamplePWA",
+  "description": "A sample PWA for testing purposes",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#2f3d58",
+  "background_color": "#2f3d58",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/icon192x192.png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/icon512x512.png",
+      "sizes": "512x512"
+    }
+  ]
+}

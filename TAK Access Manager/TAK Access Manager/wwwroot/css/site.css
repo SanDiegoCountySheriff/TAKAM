@@ -1,0 +1,211 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+
+a {
+    text-decoration: none;
+}
+
+.gradient-button {
+    margin: 0 auto;
+    font-size: 20px;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 0px;
+    width: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    cursor: pointer;
+    border-radius: 0px;
+}
+
+    .gradient-button:hover {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    }
+
+.gradient-button-4 {
+    background-image: linear-gradient(to right, #0068e1 0%, #004595 51%, #070c1a 100%)
+}
+
+    .gradient-button-4:hover {
+        background-position: right center;
+    }
+
+@font-face {
+    font-family: 'lucida-console';
+    src: url('../fonts/lucida-console.woff') format('woff');
+}
+
+.navbar {
+    padding-bottom: 0px;
+}
+
+sl-details::part(summary) {
+    color: blue;
+}
+
+.tree-with-lines {
+    --indent-guide-width: 1px;
+}
+
+.h5, h5 {
+    font-family: 'Lucida Console';
+    font-weight: bold;
+    font-size: .75rem;
+    text-align: right;
+    margin-right: 15px;
+    color: white;
+}
+
+.h2, h2 {
+    color: lightslategrey;
+}
+
+.p, p {
+    color: slategrey;
+}
+
+.btn {
+    font-family: 'Lucida Console';
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0px;
+}
+
+.btn-outline-dark {
+    outline: 1px solid;
+    font-size: 16px;
+}
+
+.btn.btn-outline-dark:hover {
+    outline-color: black;
+}
+
+.card-footer {
+    font-family: 'Lucida Console';
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card-body {
+    font-family: 'Lucida Console';
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.bi {
+    height: 31px;
+    width: 31px
+}
+
+html {
+    height: 100%
+}
+
+.containerWarning {
+    font-size: .85em;
+    color: white;
+}
+
+label {
+    color: white; 
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    height: 100%;
+    font-family: 'Lucida Console';
+    font-weight: bold;
+    background-color: #1f1f1f;
+}
+
+.footercontainer {
+    background: rgba(150, 150, 150, 0.55);
+    color: #fff;
+    width: 100%;
+    height: 20px;
+    border: 1px solid #666;
+    left: 0;
+    position: fixed;
+    bottom: 0;
+    font-size: .80rem;
+}
+
+.header {
+    margin: 0px auto;
+    width: 999px;
+}
+
+.mainbody {
+    margin: 0px auto;
+    width: 999px;
+}
+
+.banner {
+    border-radius: 30px;
+    text-align: center;
+}
+
+sl-drawer::part(body) {
+    background-color: #01204b;
+}
+sl-drawer::part(header) {
+    color: white;
+    background-color: #01204b;
+}
+sl-drawer::part(footer) {
+    background-color: #01204b;
+}
+
+#container {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#blurb {
+    position: absolute;
+    text-align: right;
+    left: 72%;
+    top: 5%;
+    right: 5%;
+    font-size: .75rem;
+    color: white;
+}
+
+.label-on-left {
+    --label-width: 3.75rem;
+    --gap-width: 1rem;
+  }
+
+  .label-on-left + .label-on-left {
+    margin-top: var(--sl-spacing-medium);
+  }
+
+  .label-on-left::part(form-control) {
+    display: grid;
+    grid: auto / var(--label-width) 1fr;
+    gap: var(--sl-spacing-3x-small) var(--gap-width);
+    align-items: center;
+  }
+
+  .label-on-left::part(form-control-label) {
+    text-align: right;
+  }
+
+  .label-on-left::part(form-control-help-text) {
+    grid-column-start: 2;
+  }
