@@ -1,0 +1,363 @@
+﻿@model TAK_Access_Manager.Models.ViewModels.GroupViewModel
+@{
+    ViewData["Title"] = "UserView";
+}
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<script src="~/js/group.js"></script>
+
+<style>
+    #adminPanesTbl1 td {
+        background: lightgrey;
+        border-radius: 10px;
+    }
+
+    #adminPanesTbl2 td {
+        background: grey;
+        border-radius: 10px;
+    }
+
+    .floatedTable {
+        float: left;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        height: 100%;
+    }
+
+    .display-4 {
+        font-family: 'Lucida Console';
+        font-weight: bold;
+        color: white;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table td, .table th {
+        padding: 12px 15px;
+        border-bottom-width: 0px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .table th {
+        background-color: darkslategrey;
+        color: white;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: lightgray;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    .table tbody tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    @@media(max-width: 500px) {
+        .table thead {
+            display: none;
+        }
+
+        .table, .table tbody, .table tr, .table td {
+            display: block;
+            width: 100%;
+        }
+
+        .table tr {
+            margin-bottom: 15px;
+        }
+
+        .table td {
+            text-align: right;
+            padding-left: 50%;
+            text-align: right;
+            position: relative;
+        }
+
+        .table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 50%;
+            padding-left: 15px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+    }
+
+    :root {
+        --sl-color-primary-50: var(--sl-color-red-50);
+        --sl-color-primary-100: var(--sl-color-red-100);
+        --sl-color-primary-200: var(--sl-color-red-200);
+        --sl-color-primary-300: var(--sl-color-red-300);
+        --sl-color-primary-400: var(--sl-color-red-400);
+        --sl-color-primary-500: var(--sl-color-red-500);
+        --sl-color-primary-600: var(--sl-color-red-600);
+        --sl-color-primary-700: var(--sl-color-red-700);
+        --sl-color-primary-800: var(--sl-color-red-800);
+        --sl-color-primary-900: var(--sl-color-red-900);
+        --sl-color-primary-950: var(--sl-color-red-950);
+        --sl-font-sans: 'Lucida Console';
+    }
+
+    sl-tab-group {
+        --indicator-color: red;
+        --track-width: 2px;
+        --sl-font-size-small: 1.5rem;
+    }
+
+    .stdbadge::part(base) {
+        border: solid 1px white;
+        background: darkslategrey;
+        border-radius: 0px;
+    }
+</style>
+
+<body>
+
+    <div class="text-center">
+        <h1 class="display-4"><i class="fa-sharp fa-solid fa-users-rays"></i> GROUP DASHBOARD: @Model.groupDetails.GroupName</h1>
+        <div class="row text-end">
+            <div class="col-md-9 mb-9">
+            </div>
+            <div class="col-md-3 mb-3">
+                <sl-select pill size="small" id=slselAnotherGroup placeholder="View Another Group">
+                    @foreach (var group in @Model.groupList)
+                    {
+                        <sl-option value="@group.GroupId">@group.GroupName</sl-option>
+                    }
+                </sl-select>
+            </div>
+        </div>
+    </div>
+    <sl-tab-group placement="top" class="custom-tabgr" style="padding-bottom: 10px;">
+        <sl-tab slot="nav" panel="general">GENERAL</sl-tab>
+        <sl-tab slot="nav" panel="actions">ACTIONS</sl-tab>
+        <sl-tab slot="nav" panel="disabled" disabled>MODIFY</sl-tab>
+
+        <sl-tab-panel name="general">
+            <sl-badge class="stdbadge" variant="neutral">Group: @Model.groupDetails.GroupName</sl-badge>
+            <sl-badge class="stdbadge" variant="neutral">Group Admin: @Model.groupDetails.GroupContactName</sl-badge>
+            <sl-badge class="stdbadge" variant="neutral">Files: @Model.fileList.Count</sl-badge>
+            <sl-badge class="stdbadge" variant="neutral">User Since: @Model.user.CreatedOn.ToShortDateString()</sl-badge>
+        </sl-tab-panel>
+        <sl-tab-panel name="actions" style="padding-top: auto;">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <a class="btn w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#renewConfigModal">
+                        <i class="fa-sharp fa-solid fa-files-medical"></i>
+                        RENEW A CERTIFICATE
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a class="btn w-100 btn-warning" data-bs-toggle="modal" data-bs-target="#revokeConfigModal">
+                        <i class="fa-sharp fa-solid fa-file-slash"></i>
+                        REVOKE A CERTIFICATE
+                    </a>
+                </div>
+            </div>
+        </sl-tab-panel>
+        <sl-tab-panel name="disabled">This is a disabled tab panel.</sl-tab-panel>
+    </sl-tab-group>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Package Name</th>
+                <th>Expiration Date</th>
+                <th>Notes</th>
+                <th>Server</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var configRow in Model.fileList)
+            {
+                <tr>
+                    <td data-label="CertName">@configRow.PackageName</td>
+                    <td data-label="ExpDate">@configRow.ExpirationDate</td>
+                    <td data-label="Notes">@configRow.Notes</td>
+                    <td data-label="Server">@configRow.Server</td>
+                    <td data-label="Status">
+                        @if (configRow.StatusCid == 2)
+                        {
+                            <a class="btn btn-outline-dark" >
+                                File Available<i class="fa-sharp fa-regular fa-download mx-2 text-success"></i>
+                            </a>
+                        }
+                        else if(configRow.StatusCid == 1) {
+                            <a class="btn btn-outline-dark" disabled>
+                                Processing...<i class="fa-sharp fa-solid fa-hourglass mx-2 text-danger" title="This connection package is still being generated. Check back in a few minutes."></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.fileList.Any())
+    {
+        <div>
+            <sl-alert id="alertNoConfigs" variant="primary" open>
+                <sl-icon slot="icon" name="info-circle"></sl-icon>
+                <strong>NO FILES AVAILABLE</strong><br />
+                No connection packages have been created for this group yet.
+            </sl-alert>
+        </div>
+    }
+
+    <div class="modal fade" id="renewConfigModal" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="renewModalTitle"><i class="fa-sharp fa-solid fa-files-medical"></i> Renew an Existing Certificate</h3>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="config-input-validation-required33">
+                        <sl-select label="Certificate to Renew:" id=slselectRenewCert value="@Model.fileList.Any() == null ? null : Model.configList.FirstOrDefault().ConfigId" required>
+                            @foreach (var config in @Model.fileList)
+                            {
+                                <sl-option value="@config.PackageName">@config.PackageName</sl-option>
+                            }
+                        </sl-select>
+                        <br />
+                        <sl-input id=slInputCertFileName label="Expiration Date:" placeholder="@DateTime.Now.AddDays(Int32.Parse(Configuration.GetSection("CertConfig")["CertLifetimeDays"]))" size="large" readonly filled help-text="This connection package will expire at the date/time above.">
+                            <i class="fa-sharp fa-regular fa-calendar-clock" slot="prefix"></i>
+                        </sl-input>
+                        <br />
+                        <sl-input id="slInputCurrUser" placeholder="@Model.user.UserName" label="Renewed by:" filled readonly>@Model.user.UserName</sl-input>
+                        <br /><br />
+                        <sl-button id=slBtnAddUser type="submit" variant="success">Create User Profile</sl-button>
+                        <br />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="modal fade" id="groupSettingsModal" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="=userSettingsModalTitle">Configure Your Group</h5>
+                        <input hidden type="text" id="currUserId" class="form-control" disabled placeholder="@Model.user.UserId" />
+                        <input hidden type="text" id="userGroupId" class="form-control" disabled value="@Model.user.PrimaryGroup" />
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Username</span>
+                            <input type="text" id="currUser" class="form-control" disabled placeholder="@Model.user.UserName" />
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+                            <span class="input-group-text">Last Logged On</span>
+                            <input type="text" id="lastLogon" class="form-control" disabled placeholder="@Model.user.LastLogon" />
+                        </div>
+                        <div class="input-group mb-3">
+
+                            @if (Model.AdminType != null)
+                            {
+                                <span class="input-group-text">Group</span>
+                                <select class="form-select" id="groupInputAdmin" class="groupInput">
+                                    @foreach (var group in Model.groupList)
+                                    {
+                                        <option value="@group.GroupId">@group.GroupName</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <span class="input-group-text">Group</span>
+                                <input class="form-control" id="groupInput" placeholder="@Model.groupDetails.GroupName" disabled />
+                            }
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+                            <span class="input-group-text">Assigned Station</span>
+                            <input type="text" id="" class="form-control" disabled placeholder="Data Services Division" />
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Agency</span>
+                            <input type="text" id="" class="form-control" disabled placeholder="San Diego Sheriff's Department" />
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+                            <span class="input-group-text">Job Title</span>
+                            <input type="text" id="" class="form-control" disabled placeholder="" />
+                        </div>
+                        <hr />
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Supervisor</span>
+                            <input type="text" id="" class="form-control" disabled placeholder="" />
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+                            <span class="input-group-text">Supervisor Phone</span>
+                            <input type="text" id="" class="form-control" disabled placeholder="" />
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Supervisor</span>
+                            <span class="input-group-text">Supervisor Email</span>
+                            <input type="text" id="" class="form-control" disabled placeholder="" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="newConfigSave" type="button" class="btn btn-primary" data-dismiss="modal" onclick="postUserSettings();">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="revokeConfigModal" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="revokeModalTitle"><i class="fa-sharp fa-solid fa-file-slash"></i> Revoke Connectivity for a Certificate</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="revoke-validation-required">
+                            <sl-select label="Certificate to Revoke:" id=slselectRenewCert value="@Model.fileList.Any() == null ? null : Model.configList.FirstOrDefault().ConfigId" required>
+                                @foreach (var config in @Model.fileList)
+                                {
+                                    <sl-option value="@config.PackageName">@config.PackageName</sl-option>
+                                }
+                            </sl-select>
+                            <br />
+                            <sl-alert variant="warning" open>
+                                <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+                                <strong>This file will be revoked by all CSSA TAK Servers</strong><br />
+                                This file will no longer be downloadable in TAKAM is processed automatically by the TAK Servers within a few minutes.
+                            </sl-alert>
+                            <br />
+                            <sl-input id="slInputCurrUser" placeholder="@Model.user.UserName" label="Revoked by:" filled readonly>@Model.user.UserName</sl-input>
+                            <br /><br />
+                            <sl-button id=slBtnRevoke type="submit" variant="warning">Revoke Certificate</sl-button>
+                            <br />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</body>

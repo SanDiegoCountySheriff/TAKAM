@@ -1,0 +1,372 @@
+﻿@using TAK_Access_Manager.Models.ViewModels
+@model IndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@@shoelace-style/shoelace@2.4.0/dist/components/carousel/carousel.js"></script>
+
+<script src="~/js/Index.js" type="text/javascript"></script>
+
+<div class="progress mb-2" id="loading">
+    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+</div>
+
+<div class="">
+    <div class="banner mb-4">
+        <div class="row">
+            <div class="col-md-3 col-12 d-none d-md-block my-auto">
+                <img src="~/files/CSSA STAR OUTLINE200.png" class="h-25 py-2" />
+            </div>
+            <div class="col-md-3 col-12 my-auto">
+                <img src="~/files/tak logo.png" class="h-25 d-md-block d-none" />
+
+                <div class="d-sm-block d-md-none">
+                    <img src="~/files/CSSA STAR OUTLINE200.png" class="h-25 py-2" style="max-height: 100px" />
+                    <img src="~/files/tak logo.png" class="h-25 py-2" style="max-height: 100px" />
+                </div>
+            </div>
+            <div class="col-md-6 col-12 d-none d-md-block">
+                <div style="max-width: 1000px; color: white;">
+                    <h2 style="
+                        font-family: 'Lucida Console';
+                        font-weight: bold;
+                        font-size: 1.2rem;
+                        text-align: right;
+                        margin-right: 15px;
+                        color: white;">
+                        CALIFORNIA STATE SHERIFF'S ASSOCIATION
+                    </h2>
+                    <h1 style="
+                        font-family: 'Lucida Console';
+                        font-weight: bold;
+                        font-size: 3rem;
+                        text-align: right;
+                        margin-right: 15px;
+                        color: white;">
+                        TEAM AWARENESS KIT
+                    </h1>
+                    <h3 style="
+                        font-family: 'Lucida Console';
+                        font-weight: bold;
+                        font-size: 1.5rem;
+                        text-align: right;
+                        margin-right: 15px;
+                        color: white;">
+                        ACCESS MANAGER
+                    </h3>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-12 d-block d-sm-block d-md-none">
+                <div style="max-width: 1000px; color: white;">
+                    <h2 style="
+                        font-family: 'Lucida Console';
+                        font-weight: bold;
+                        font-size: 1.2rem;
+                        color: white;">
+                        CALIFORNIA STATE SHERIFF'S ASSOCIATION
+                    </h2>
+                    <h1 style="
+                        font-family: 'Lucida Console';
+                        font-weight: bold;
+                        font-size: 2rem;
+                        color: white;">
+                        TEAM AWARENESS KIT
+                    </h1>
+                    <h3 style="
+                        font-family: 'Lucida Console';
+                        font-weight: bold;
+                        font-size: 1rem;
+                        color: white;">
+                        ACCESS MANAGER
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="modal fade" id="newConfigModal" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title"><i class="fa-sharp fa-solid fa-user-plus"></i> Onboard another user</h3>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="config-input-validation-required">
+                        <sl-input id="slInputCertName" label="Username" required pattern="[a-zA-Z0-9]+" help-text="Enter a team-recognizable callsign. Symbols are not allowed."></sl-input>
+                        <br />
+                        <sl-select label="User" id=slConfigSelectUser value="@Model.user.UserName" required help-text="Select the user this file will be available for in their dashboard">
+                            @foreach (var usr in Model.userList)
+                            {
+                                <sl-option value="@usr.UserName">@usr.UserName</sl-option>
+                            }
+                        </sl-select>
+                        <br />
+                        <sl-select label="Group" id=slConfigSelectGroup value="SDSD" required">
+                            @foreach (var group in @Model.groupList)
+                            {
+                                <sl-option value="@group.GroupName">@group.GroupName</sl-option>
+                            }
+                        </sl-select>
+                        <br />
+                        <sl-input id=slInputCertFileName placeholder="File name" size="large" readonly filled>
+                            <i class="fa-sharp fa-regular fa-file-user" slot="prefix"></i>
+                        </sl-input>
+                        <br />
+                        <sl-input id=slInputCertExpDate label="Expiration Date:" placeholder="@DateTime.Now.AddDays(Int32.Parse(Configuration.GetSection("CertConfig")["CertLifetimeDays"]))" size="large" readonly filled help-text="This connection package will expire at the date/time above.">
+                            <i class="fa-sharp fa-regular fa-calendar-clock" slot="prefix"></i>
+                        </sl-input>
+                        <br />
+                        <div class="animation-fadein-alertNonAdmin">
+                            <sl-animation name="fadeInDown" easing="ease-in-out" duration="1000" iterations="1">
+                                <div>
+                                    <sl-alert id="alertNotAdmin" variant="primary" open hidden>
+                                        <sl-icon slot="icon" name="info-circle"></sl-icon>
+                                        <strong>YOU ARE NOT A REGISTERED ADMIN</strong><br />
+                                        you are not authorized to create users for this group. Use the CONTACT US menu to request administrator rights for the selected group.
+                                    </sl-alert>
+                                </div>
+                            </sl-animation>
+                            <br />
+                        </div>
+                        <sl-select label="Server" id="slSelectServer" value="SBX" required>
+                            <sl-option value="SBX">Sandbox</sl-option>
+                            <sl-option value="PRD">Production</sl-option>
+                            <sl-option value="TRN" disabled>Training</sl-option>
+                            <sl-option value="TEST" disabled>Test</sl-option>
+                        </sl-select>
+                        <br />
+                        <sl-input id="slInputUserNotes" placeholder="Additional Comments..." label="Notes" help-text="These will be visible only in TAKAM."></sl-input>
+                        <br />
+                        <sl-input id="slInputCurrUser" placeholder="@Model.user.UserName" label="Created by" filled readonly>@Model.user.UserName</sl-input>
+                        <br /><br />
+                        <sl-button id=slBtnAddUser type="submit" variant="success">Create User Profile</sl-button>
+                        <br />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="onboardUnitModal" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="onboardModalTitle"><i class="fa-sharp fa-solid fa-users-medical"></i> Onboard a unit/organization</h3>
+                    <input hidden type="text" id="currUserId" class="form-control" disabled placeholder="@Model.user.UserId" />
+                    <input hidden type="text" id="userGroupId" class="form-control" disabled value="@Model.user.PrimaryGroup" />
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="input-validation-required">
+                        <sl-input id="slgroupname" class="test1" label="Group Alias" required pattern="[a-zA-Z0-9]+" help-text="This will be appended to your agency code. Symbols are not allowed."></sl-input>
+                        <br />
+                        <sl-select label="Agency" id=slSelectAgency value="SDSD" required>
+                            <sl-option value="SDSD">San Diego Sheriff [SDSD]</sl-option>
+                            <sl-option value="EXT">Other External Agency [EXT]</sl-option>
+                        </sl-select>
+                        <br />
+                        <sl-input id=inputGroupName placeholder="Your Group Name" size="large" readonly filled>
+                            <i class="fa-sharp fa-solid fa-users-viewfinder" slot="prefix"></i>
+                        </sl-input>
+                        <br />
+                        <div class="animation-fadein-alertExtAgency">
+                            <sl-animation name="fadeInDown" easing="ease-in-out" duration="1000" iterations="1">
+                                <div>
+                                    <sl-alert id="alertExtAgency" variant="primary" open hidden>
+                                        <sl-icon slot="icon" name="info-circle"></sl-icon>
+                                        <strong>EXTERNAL AGENCY</strong><br />
+                                        This group will be given basic permissions and will not be allowed to connect to other groups. To share data between your new group and existing group, use the CONTACT US menu to request your agency be created.
+                                    </sl-alert>
+                                </div>
+                            </sl-animation>
+                            <br />
+                        </div>
+                        <sl-input type="email" label="Designated Admin" required id=inputGroupAdmin placeholder="admin@sheriff.com" help-text="The email of the person who will regularly create user profiles. They do not need to have an account at this time.">
+                            <i class="fa-sharp fa-solid fa-user-shield" slot="prefix"></i>
+                        </sl-input>                    <br /><br />
+                        <sl-button id=btnAddGroup type="submit" variant="success">Create Group</sl-button>
+                        <br />
+                        <sl-progress-bar indeterminate hidden id=createNewGroupLoading></sl-progress-bar>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="eventCreateModal" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="eventCreateModalTitle"><i class="fa-sharp fa-solid fa-calendar-circle-user"></i> Create an event connection package</h3>
+                    <input hidden type="text" id="currUserId" class="form-control" disabled placeholder="@Model.user.UserId" />
+                    <input hidden type="text" id="userGroupId" class="form-control" disabled value="@Model.user.PrimaryGroup" />
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="input-validation-required">
+                        <sl-input id="slEventCode" label="Event Code" required pattern="[a-zA-Z0-9]+" help-text="This will be appended to your group name. Symbols are not allowed. A recognizable acronym is recommended."></sl-input>
+                        <br />
+                        <sl-textarea id="slEventDesc" label="Event Description" clearable required placeholder="Event description..." help-text="This will be visible only in TAKAM."></sl-textarea>
+                        <br />
+                        <sl-select label="Groups" id=slConfigSelectGroup value="ANON" required multiple clearable help-text="Select which groups will have this file available to download in TAKAM.">
+                            @foreach (var group in @Model.groupList)
+                            {
+                                <sl-option value="@group.GroupName">@group.GroupName</sl-option>
+                            }
+                        </sl-select>
+                        <br />
+                        <sl-input id=inputGroupName placeholder="Your Event File Name" size="large" readonly filled>
+                            <i class="fa-sharp fa-solid fa-calendar-lines-pen" slot="prefix"></i>
+                        </sl-input>
+                        <br />
+                        <sl-input id="slEventCurrUser" placeholder="@Model.user.UserName" label="Created by" filled readonly>@Model.user.UserName</sl-input>
+                        <br /><br />
+                        <sl-button id=btnAddGroup type="submit" variant="success">Create Group</sl-button>
+                        <br />
+                        <sl-progress-bar indeterminate hidden id=createNewGroupLoading></sl-progress-bar>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="initConfig" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title"><i class="fa-sharp fa-solid fa-user-pen"></i> Configure Your Account</h3>
+                    <input hidden type="text" id="currUserId" class="form-control" disabled placeholder="@Model.user.UserId" />
+                    <input hidden type="text" id="userGroupId" class="form-control" disabled value="@Model.user.PrimaryGroup" />
+                </div>
+                <div class="modal-body">
+                    <form class="input-validation-required">
+                        <sl-tree class="tree-with-lines">
+                            <sl-tree-item expanded>
+                                Deciduous
+                                <sl-tree-item>Birch</sl-tree-item>
+                                <sl-tree-item expanded>
+                                    Maple
+                                    <sl-tree-item>
+                                        <sl-select label="Group" id=slConfigSelectGroup value="SDSD" required">
+                                            @foreach (var group in @Model.groupList)
+                                            {
+                                                <sl-option value="@group.GroupName">@group.GroupName</sl-option>
+                                            }
+                                        </sl-select>
+                                    </sl-tree-item>
+                                    <sl-tree-item>Red maple</sl-tree-item>
+                                    <sl-tree-item>Sugar maple</sl-tree-item>
+                                </sl-tree-item>
+                                <sl-tree-item>Oak</sl-tree-item>
+                            </sl-tree-item>
+
+                            <sl-tree-item>
+                                Coniferous
+                                <sl-tree-item>Cedar</sl-tree-item>
+                                <sl-tree-item>Pine</sl-tree-item>
+                                <sl-tree-item>Spruce</sl-tree-item>
+                            </sl-tree-item>
+
+                            <sl-tree-item>
+                                Non-trees
+                                <sl-tree-item>Bamboo</sl-tree-item>
+                                <sl-tree-item>Cactus</sl-tree-item>
+                                <sl-tree-item>Fern</sl-tree-item>
+                            </sl-tree-item>
+                        </sl-tree>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="dropdown col-md-3 mb-3">
+            <button class="btn w-100 btn-primary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-sharp fa-solid fa-file-arrow-down"></i>
+                QUICK ACTIONS
+            </button>
+            <ul class="dropdown-menu btn w-auto" aria-labelledby="dropdownMenuButton2">
+                <li>
+                    <button class="btn w-100 btn-primary" id="btnOnboard" disabled>
+                        <i class="fa-sharp fa-solid fa-folder-plus"></i>
+                        CREATE A FILE
+                    </button>
+                </li>
+                <li>
+                    <button class="btn w-100 btn-primary" id="btnCreateGroup" data-bs-toggle="modal" data-bs-target="#onboardUnitModal">
+                        <i class="fa-sharp fa-solid fa-users-medical"></i>
+                        CREATE A GROUP
+                    </button>
+                </li>
+                <li>
+                    <button class="btn w-100 btn-warning" id="btnQuickRevoke" disabled>
+                        <i class="fa-sharp fa-solid fa-file-slash"></i>
+                        REVOKE A PACKAGE
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="dropdown col-md-3 mb-3">
+            <button class="btn w-100 btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-sharp fa-solid fa-file-arrow-down"></i>
+                DASHBOARDS
+            </button>
+            <ul class="dropdown-menu btn w-auto" aria-labelledby="dropdownMenuButton1">
+                <li>
+                    <a class="btn w-100 btn-primary" id="btnOnboard" asp-action="UserView" asp-controller="User">
+                        <i class="fa-sharp fa-regular fa-folder-user"></i>
+                        YOUR FILES
+                    </a>
+                </li>
+                <li>
+                    <a class="btn w-100 btn-primary" asp-action="GroupView" asp-controller="Group" asp-route-id="@Model.user.PrimaryGroup">
+                        <i class="fa-sharp fa-solid fa-users-rays"></i>
+                        GROUP FILES
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a class="btn w-100 btn-primary" id="btnAgencyDash" href="/api/Admin/Admin">
+                <i class="fa-sharp fa-solid fa-people-roof" style="color: #000000;"></i>
+                AGENCY ADMIN
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn w-100 btn-primary" disabled data-bs-toggle="modal" data-bs-target="#eventCreateModal">
+                <i class="fa-sharp fa-solid fa-calendar-circle-user"></i>
+                CREATE AN EVENT
+            </button>
+        </div>
+    }
+    else
+    {
+        <a class="gradient-button gradient-button-4" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignIn">
+            <i class="fa-sharp fa-solid fa-right-to-bracket"></i> GET STARTED
+        </a>
+    }
+</div>
+<br />
+<div id="container">
+    <img src="~/images/takamhome.png" />
+</div>

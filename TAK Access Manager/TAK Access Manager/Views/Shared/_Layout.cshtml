@@ -1,0 +1,211 @@
+﻿@using System.Security.Principal
+@{
+    ViewData["Title"] = "Layout";
+}
+<!DOCTYPE html>
+<html lang="en" style="font-size: 16px">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TAK Access Manager</title>
+    <link rel="icon" type="image/x-icon" href="~/files/tak logo.png">
+    <a href="~/lib/jquery/dist/jquery.min.map"></a>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://kit.fontawesome.com/8d3f19eba0.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@shoelace-style/shoelace@2.0.0/dist/themes/light.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@@shoelace-style/shoelace@2.0.0/dist/shoelace.js"></script>
+    <script src="~/js/toastr/toastr.js"></script>
+    <script src="~/js/toastr/toastr.min.js"></script>
+    <a href="~/js/toastr/toastr.min.js.map"></a>
+</head>
+<style>
+    :root {
+        --sl-color-primary-50: rgb(249 249 250);
+        --sl-color-primary-100: rgb(236 236 237);
+        --sl-color-primary-200: rgb(221 222 224);
+        --sl-color-primary-300: rgb(205 206 209);
+        --sl-color-primary-400: rgb(184 186 190);
+        --sl-color-primary-500: rgb(158 160 165);
+        --sl-color-primary-600: rgb(129 132 139);
+        --sl-color-primary-700: rgb(105 108 116);
+        --sl-color-primary-800: rgb(86 89 99);
+        --sl-color-primary-900: rgb(59 63 74);
+        --sl-color-primary-950: rgb(34 39 51);
+        --sl-font-serif: 'Lucida Console';
+        --sl-font-sans: 'Lucida Console';
+        --sl-font-mono: 'Lucida Console';
+        --sl-border-radius-small: 0rem;
+        --sl-border-radius-medium: 0rem;
+        --sl-border-radius-large: 0rem;
+        --sl-border-radius-x-large: 0rem;
+        --sl-border-radius-circle: 0rem;
+        --sl-border-radius-pill: 0rem;
+    }
+</style>
+<body>
+    <header>
+
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-transparent box-shadow mb-2">
+            <div class="container-fluid">
+                <h1 style="color: white;" style>TAKAM</h1>
+
+                <sl-drawer id="headerDrawer" placement="end" class="drawer-placement-top" style="--size: 70vw;" label="TAKAM Menu">
+                    @if (User.IsInRole("TAKAM-ADMINS-ROLE"))
+                    {
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                            <sl-button variant="neutral" size="medium" circle title="Home">
+                                <i class="fa-sharp fa-regular fa-house"></i>
+                            </sl-button>
+                            <label class="flex-grow-1 d-sm-block d-md-none">Home</label>
+                        </a>
+                        
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">
+                            <sl-button variant="neutral" size="medium" circle title="Privacy">
+                                <i class="fa-sharp fa-regular fa-lock"></i>
+                            </sl-button>
+                            <label class="flex-grow-1 d-sm-block d-md-none">Privacy</label>
+                        </a>
+                    }
+                    <a class="nav-link text-dark" data-bs-toggle="modal" data-bs-target="#faqModal">
+                        <sl-button variant="neutral" size="medium" circle title="FAQ">
+                            <i class="fa-sharp fa-regular fa-question"></i>
+                        </sl-button>
+                        <label class="flex-grow-1 d-sm-block d-md-none">F.A.Q.</label>
+                    </a>
+                    <a class="nav-link text-dark" onclick="parent.location='mailto:DSDDevOps@sdsheriff.org'">
+                        <sl-button variant="neutral" size="medium" circle title="Contact Us">
+                            <i class="fa-sharp fa-regular fa-paper-plane"></i>
+                        </sl-button>
+                        <label class="flex-grow-1 d-sm-block d-md-none">Contact Us</label>
+                    </a>
+                    <partial name="_LoginPartial" />
+                    <sl-button slot="footer" variant="primary">
+                        <i class="fa-sharp fa-solid fa-xmark"></i>
+                        Close
+                    </sl-button>
+                </sl-drawer>
+
+                <button class="navbar-toggler" type="button">
+                    <i class="fa-sharp fa-solid fa-layer-group" style="color: white;"></i>
+                </button>
+
+                <script>
+                    const drawer = document.querySelector('.drawer-placement-top');
+                    const openButton = drawer.nextElementSibling;
+                    const closeButton = drawer.querySelector('sl-button[variant="primary"]');
+
+                    openButton.addEventListener('click', () => drawer.show());
+                    closeButton.addEventListener('click', () => drawer.hide());
+                </script>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex d-none d-md-block justify-content-between">
+                    <ul class="navbar-nav flex-grow-1" style="padding-left: 20px;">
+                        @if (User.IsInRole("TAKAM-ADMINS-ROLE")) {
+                            <li class="nav-item d-none d-md-block" id="hidethis">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                    <sl-button variant="neutral" size="medium" circle title="Home">
+                                        <i class="fa-sharp fa-regular fa-house"></i>
+                                    </sl-button>
+                                    <label class="flex-grow-1 d-sm-block d-md-none">Home</label>
+                                </a>
+
+                            </li>
+                        }
+
+                        <li class="nav-item d-none d-md-block">
+                            <a class="nav-link text-dark" data-bs-toggle="modal" data-bs-target="#faqModal">
+                                <sl-button variant="neutral" size="medium" circle title="FAQ">
+                                    <i class="fa-sharp fa-regular fa-question"></i>
+                                </sl-button>
+                                <label class="flex-grow-1 d-sm-block d-md-none">F.A.Q.</label>
+                            </a>
+                        </li>
+
+                        <li class="nav-item d-none d-md-block" id="hidethis">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <sl-button variant="neutral" size="medium" circle title="Privacy">
+                                    <i class="fa-sharp fa-regular fa-lock"></i>
+                                </sl-button>
+                                <label class="flex-grow-1 d-sm-block d-md-none">Privacy</label>
+                            </a>
+                        </li>
+
+                        <li class="nav-item d-none d-md-block">
+                            <a class="nav-link text-dark" onclick="parent.location='mailto:DSDDevOps@sdsheriff.org'">
+                                <sl-button variant="neutral" size="medium" circle title="Contact Us">
+                                    <i class="fa-sharp fa-regular fa-paper-plane"></i>
+                                </sl-button>
+                                <label class="flex-grow-1 d-sm-block d-md-none">Contact Us</label>
+                            </a>
+                        </li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $('[data-toggle="popover"]').popover();
+                        });
+                    </script>
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="modal fade" id="faqModal" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="faqModalTitle">What is TAKAM?</h2>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Team Awareness Kit - Access Manager (TAKAM) is a web application that can be used to onboard units and organizations onto the CSSA TAK Server by allowing designated administrators to create self-serviced connection packages.
+                    </p>
+                    <sl-alert variant="neutral" open>
+                        <sl-icon slot="icon" name="question-circle"></sl-icon>
+                        <strong>Are you an admin?</strong><br />
+                        If you are an designated administrator for an approved group, you should see the main page upon initial login. Otherwise, regular users will only have the downloadable files page available to them.
+                    </sl-alert>
+                    <br />
+                    <sl-details summary="How to use (Admins)">
+                        Admins can use the "CREATE USER PROFILE" menu to quickly create connection packages for anyone in their assigned unit that they want to onboard. After clicking "SUBMIT" you will be redirected to the files page where you can see the status of the connection package you just requested.
+                    </sl-details>
+                    <sl-details summary="How to use (Non Admin)">
+                        If not an administrator, users will automatically directed to the file page and see any files that are created for them by an admin.
+                    </sl-details>
+                    <sl-details summary="How can I give someone else in my team admin access?">
+                        You can use the "CONTACT US" menu to request admin access for a user in your group or to request access for an admin in another group.
+                    </sl-details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted footercontainer">
+        <div class="containerWarning">
+            &copy; 2022 - TAK_Access_Manager - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/select2/dist/js/select2.full.min.js"></script>
+    <link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/lib/select2/dist/css/select2-bootstrap4.min.css" rel="stylesheet" />
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

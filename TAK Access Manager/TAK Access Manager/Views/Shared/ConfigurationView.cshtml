@@ -1,0 +1,253 @@
+﻿@model List<Configuration>
+@{
+    ViewData["Title"] = "ConfigurationView";
+}
+@if (!ViewBag.isGroupAdmin)
+{
+    <style>
+        #hidethis {  display: none; }
+    </style>
+}
+<style>
+    #adminPanesTbl1 td {
+        background: lightgrey;
+        border-radius: 10px;
+    }
+
+    #adminPanesTbl2 td {
+        background: grey;
+        border-radius: 10px;
+    }
+
+    .floatedTable {
+        float: left;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        height: 100%;
+    }
+
+    .display-4 {
+        font-family: Tw Cen MT;
+        font-weight: bold;
+        color: white;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table td, .table th {
+        padding: 12px 15px;
+        border-bottom-width: 0px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .table th {
+        background-color: darkslategrey;
+        color: white;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: lightgray;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    .table tbody tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    @@media(max-width: 500px) {
+        .table thead {
+            display: none;
+        }
+
+        .table, .table tbody, .table tr, .table td {
+            display: block;
+            width: 100%;
+        }
+
+        .table tr {
+            margin-bottom: 15px;
+        }
+
+        .table td {
+            text-align: right;
+            padding-left: 50%;
+            text-align: right;
+            position: relative;
+        }
+
+        .table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 50%;
+            padding-left: 15px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+    }
+
+    :root {
+        --sl-color-primary-50: var(--sl-color-white-50);
+        --sl-color-primary-100: var(--sl-color-white-100);
+        --sl-color-primary-200: var(--sl-color-white-200);
+        --sl-color-primary-300: var(--sl-color-white-300);
+        --sl-color-primary-400: var(--sl-color-white-400);
+        --sl-color-primary-500: var(--sl-color-white-500);
+        --sl-color-primary-600: var(--sl-color-white-600);
+        --sl-color-primary-700: var(--sl-color-white-700);
+        --sl-color-primary-800: var(--sl-color-white-800);
+        --sl-color-primary-900: var(--sl-color-white-900);
+        --sl-color-primary-950: var(--sl-color-white-950);
+        --sl-font-sans: 'Lucida Console';
+    }
+
+    sl-tab-group {
+        --indicator-color: black;
+        --track-width: 2px;
+        --sl-font-size-small: 1.5rem;
+    }
+
+    .stdbadge::part(base) {
+        border: solid 1px black;
+        background: black;
+        border-radius: 0px;
+    }
+</style>
+
+<body>
+    @if (ViewBag.IsGroupAdmin)
+    {
+        <div class="text-center">
+            <h1 class="display-4"><i class="fa-sharp fa-solid fa-users-rays"></i> ADMIN DASHBOARD: @ViewBag.userGroup</h1>
+        </div>
+        <sl-tab-group placement="top" class="custom-tabgr" style="padding-bottom: 10px;">
+            <sl-tab slot="nav" panel="general">GENERAL</sl-tab>
+            <sl-tab slot="nav" panel="actions">ACTIONS</sl-tab>
+            <sl-tab slot="nav" panel="disabled" disabled>MODIFY</sl-tab>
+
+            <sl-tab-panel name="general">
+                <sl-badge class="stdbadge" variant="neutral">Users: 2</sl-badge>
+                <sl-badge class="stdbadge" variant="neutral">Files: 2</sl-badge>
+                <sl-badge class="stdbadge" variant="neutral">Date Created: 2-2-2023</sl-badge>
+            </sl-tab-panel>
+            <sl-tab-panel name="actions" style="padding-top: auto;">
+                <sl-button variant="default" size="small" data-bs-toggle="modal" data-bs-target="#newConfigModal">
+                    <i class="fa-solid fa-folder-plus"></i>
+                    Add User
+                </sl-button>
+
+                <sl-button variant="default" size="small">
+                    <sl-icon slot="prefix" name="gear"></sl-icon>
+                    Settings
+                </sl-button>
+
+                <sl-button variant="default" size="small">
+                    <sl-icon slot="prefix" name="gear"></sl-icon>
+                    Settings
+                </sl-button>
+            </sl-tab-panel>
+            <sl-tab-panel name="disabled">This is a disabled tab panel.</sl-tab-panel>
+        </sl-tab-group>
+    }
+    else 
+    {
+        <div class="mb-4">
+            <h1 class="display-4"><i class="fa-solid fa-file-arrow-down"></i> YOUR FILES</h1>
+            <h5><i class="fa-sharp fa-regular fa-circle-info"></i> Files may take a few minutes to be created before they are downloadable.</h5>
+        </div>
+    }
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Package Name</th>
+                <th>Expiration Date</th>
+                <th>Notes</th>
+                <th>Server</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var configRow in Model)
+        {
+            <tr>
+                <td data-label="PackageName">@configRow.Subject</td>
+                <td data-label="ExpDate">@configRow.ExpirationDate</td>
+                <td data-label="Notes">@configRow.Notes</td>
+                <td data-label="Server">@configRow.Server</td>
+                <td data-label="Download">
+                    @if (configRow.BlobPath != "" && configRow.BlobPath != null)
+                    {
+                        <a class="btn btn-outline-dark" href="~/api/Configs/DownloadFile/@configRow.ConfigId">
+                            @configRow.FileName<i class="fa-sharp fa-regular fa-download mx-2 text-success"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-dark" disabled>
+                            Processing...<i class="fa-sharp fa-solid fa-hourglass mx-2 text-danger" title="This connection package is still being generated. Check back in a few minutes."></i>
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="newConfigModal" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tableDropModalTitle">Enter the parameters for your server connection.</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Certificate Name</span>
+                        <input type="text" id="certNameInput" class="form-control" />
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Group</span>
+                        <select class="form-select" id="groupSelectList">
+                            @foreach (var group in ViewBag.groups)
+                            {
+                                <option value="@group.GroupId">@group.GroupName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Generated By</span>
+                        <input type="text" id="genByInput" class="form-control" disabled placeholder="@ViewBag.currUser" />
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Notes</span>
+                        <input type="text" id="notesInput" class="form-control" />
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Server</span>
+                        <select type="text" id="serverInput" class="form-select">
+                            <option>Sandbox</option>
+                            <option>Production</option>
+                            <option>Training</option>
+                            <option>Federation</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="newConfigSave" type="button" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>

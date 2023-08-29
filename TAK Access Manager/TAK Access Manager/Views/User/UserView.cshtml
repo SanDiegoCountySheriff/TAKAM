@@ -1,0 +1,524 @@
+﻿@model TAK_Access_Manager.Models.ViewModels.UserViewModel
+@using Microsoft.AspNetCore.Authorization
+@using System.Text.RegularExpressions
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@inject IAuthorizationService AuthorizationService
+@{
+    ViewData["Title"] = "UserView";
+}
+@if (User.IsInRole("TAKAM-ADMINS-ROLE") && Model.user.Active)
+{
+    <style>
+        #hidethis {
+            display: none;
+        }
+    </style>
+}
+<style>
+    #adminPanesTbl1 td {
+        background: lightgrey;
+        border-radius: 10px;
+    }
+
+    #adminPanesTbl2 td {
+        background: grey;
+        border-radius: 10px;
+    }
+
+    .floatedTable {
+        float: left;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        height: 100%;
+    }
+
+    .display-4 {
+        font-family: 'Lucida Console';
+        font-weight: bold;
+        color: white;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table td, .table th {
+        padding: 12px 15px;
+        border-bottom-width: 0px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .table th {
+        background-color: darkslategrey;
+        color: white;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: lightgray;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    .table tbody tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    @@media(max-width: 500px) {
+        .table thead {
+            display: none;
+        }
+
+        .table, .table tbody, .table tr, .table td {
+            display: block;
+            width: 100%;
+        }
+
+        .table tr {
+            margin-bottom: 15px;
+        }
+
+        .table td {
+            text-align: right;
+            padding-left: 50%;
+            text-align: right;
+            position: relative;
+        }
+
+        .table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 50%;
+            padding-left: 15px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+    }
+
+    :root {
+        --sl-color-primary-50: #0b5ed7;
+        --sl-color-primary-100: #0b5ed7;
+        --sl-color-primary-200: #0b5ed7;
+        --sl-color-primary-300: #0b5ed7;
+        --sl-color-primary-400: #0b5ed7;
+        --sl-color-primary-500: #0b5ed7;
+        --sl-color-primary-600: #0b5ed7;
+        --sl-color-primary-700: #0b5ed7;
+        --sl-color-primary-800: #0b5ed7;
+        --sl-color-primary-900: #0b5ed7;
+        --sl-color-primary-950: #0b5ed7;
+        --sl-font-serif: 'Lucida Console';
+        --sl-font-sans: 'Lucida Console';
+        --sl-font-mono: 'Lucida Console';
+        --sl-border-radius-small: 0rem;
+        --sl-border-radius-medium: 0rem;
+        --sl-border-radius-large: 0rem;
+        --sl-border-radius-x-large: 0rem;
+        --sl-border-radius-circle: 0rem;
+        --sl-border-radius-pill: 0rem;
+
+        --sl-color-secondary-50: var(--sl-color-red-50);
+        --sl-color-secondary-100: var(--sl-color-red-100);
+        --sl-color-secondary-200: var(--sl-color-red-200);
+        --sl-color-secondary-300: var(--sl-color-red-300);
+        --sl-color-secondary-400: var(--sl-color-red-400);
+        --sl-color-secondary-500: var(--sl-color-red-500);
+        --sl-color-secondary-600: var(--sl-color-red-600);
+        --sl-color-secondary-700: var(--sl-color-red-700);
+        --sl-color-secondary-800: var(--sl-color-red-800);
+        --sl-color-secondary-900: var(--sl-color-red-900);
+        --sl-color-secondary-950: var(--sl-color-red-950);
+    }
+
+    sl-tab-group {
+        --indicator-color: #0b5ed7;
+        --track-width: 4px;
+        --sl-font-size-small: 1.5rem;
+    }
+
+    .stdbadge::part(base) {
+        border: solid 1px darkslategrey;
+        background: darkslategrey;
+        border-radius: 0px;
+    }
+</style>
+<script type="module">
+    const form = document.querySelector('.config-input-validation-required');
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        postConfig();
+    });
+
+    const formReissue = document.querySelector('.reissue-input-validation-required');
+    formReissue.addEventListener('submit', event => {
+        event.preventDefault();
+        reissueConfig();
+    });
+</script>
+<script src="~/js/User.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<body id="userBody">
+    <sl-divider style="--width: 4px;"></sl-divider>
+    <div class="text-center">
+        <h1 style="
+                        font-family: 'Lucida Console';
+                        font-weight: bold;
+                        font-size: 1.8rem;
+                        text-align: right;
+                        margin-right: 15px;
+                        color: white;">
+            <i class="fa-sharp fa-solid fa-address-card"></i> USER DASHBOARD
+        </h1>
+        <h5 class="d-none d-md-block"><i class="fa-sharp fa-regular fa-circle-info"></i> Files may take a few minutes to be created before they are downloadable.</h5>
+    </div>
+    <sl-tab-group placement="top" class="custom-tabgr" style="padding-bottom: 10px; width: 100%;">
+        <sl-tab slot="nav" panel="actions">ACTIONS</sl-tab>
+        <sl-tab slot="nav" panel="general">GENERAL</sl-tab>
+        <sl-tab-panel name="actions" style="">
+            <div class="row col-md-12">
+                @if (!Model.fileList.Any() && (User.IsInRole("TAKAM-USERS-ROLE") || User.IsInRole("TAKAM-ADMINS-ROLE")) && Model.user.Active)
+                {
+                    <div class="col-sm-12 col-md-3 mb-3">
+                        <a class="btn w-100 btn-light" data-bs-toggle="modal" data-bs-target="#newConfigModal">
+                            <i class="fa-sharp fa-solid fa-file-plus"></i>
+                            CREATE CONNECTION PACKAGE
+                        </a>
+                    </div>
+                }
+                <div class="col-sm-12 col-md-3 mb-3">
+                    <a class="btn w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#userSettingsModal">
+                        <i class="fa-sharp fa-solid fa-user-pen"></i>
+                        VIEW YOUR ACCOUNT
+                    </a>
+                </div>
+                <div class="col-sm-12 col-md-3 mb-3">
+                    <a class="btn w-100 btn-primary" target="_blank" href="https://web.microsoftstream.com/video/b09035ee-bbaa-415f-9316-e729436f486f">
+                        <i class="fa-sharp fa-solid fa-location-question fa-beat-fade"></i>
+                        TRAINING VIDEO
+                    </a>
+                </div>
+            </div>
+        </sl-tab-panel>
+        <sl-tab-panel name="general">
+            <sl-badge class="stdbadge" variant="neutral">Group: @Model.groupDetails.GroupName</sl-badge>
+            <sl-badge class="stdbadge" variant="neutral">Group Admin: @Model.groupDetails.GroupContactName</sl-badge>
+            <sl-badge class="stdbadge" variant="neutral">Files: @Model.fileList.Count</sl-badge>
+            <sl-badge class="stdbadge" variant="neutral">User Since: @Model.user.CreatedOn.ToShortDateString()</sl-badge>
+        </sl-tab-panel>
+    </sl-tab-group>
+
+    @if (!(User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) || !Model.user.Active)
+    {
+        <div>
+            <sl-alert id="alertNoConfigs" variant="warning" open>
+                <sl-icon slot="icon" name="exclamation-circle-fill"></sl-icon>
+                <strong>REQUEST APPROVAL</strong><br />
+                Your account is not approved to create or download new connection packages for TAK. Please request access by emailing <strong>DSDDevOps@sdsheriff.org</strong>
+            </sl-alert>
+        </div>
+    }
+    else if (!Model.fileList.Any() && (User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) && Model.user.Active)
+    {
+        <div>
+            <sl-alert id="alertNotAuthorized" variant="primary" open>
+                <sl-icon slot="icon" name="info-circle"></sl-icon>
+                <strong>NO FILES AVAILABLE</strong><br />
+                No connection packages have been created for this user yet.
+            </sl-alert>
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Package Name</th>
+                <th>Expiration Date</th>
+                <th>Notes</th>
+                <th>Server</th>
+                <th>Download</th>
+                <th>Created On</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.fileList)
+            {
+                <tr>
+                    <td data-label="CertName">@row.PackageName</td>
+                    <td data-label="ExpDate">@row.ExpirationDate</td>
+                    @if (row.StatusCid == 3)
+                    {
+                        <td data-label="Notes">@row.Notes <i class="fa-sharp fa-solid fa-file-slash fa-fade" style="color: #ff0000;"></i></td>
+                    }
+                    else
+                    {
+                        <td data-label="Notes">@row.Notes</td>
+                    }
+                    <td data-label="Server">@row.Server</td>
+                    <td data-label="Download">
+
+                        @if (row.BlobPath != "" && row.BlobPath != null && row.StatusCid != 1)
+                        {
+                            if (row.StatusCid == 2 && (User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) && Model.user.Active)
+                            {
+                                <button class="btn btn-outline-dark" onclick="location.href='DownloadFile/@row.PackageId'">
+                                    @row.PackageName<i class="fa-sharp fa-regular fa-download mx-2 text-success"></i>
+                                </button>
+                            }
+                            else if (row.StatusCid == 4 && (User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) && Model.user.Active && !(Model.fileList.Any(x => x.ConfigureDt > row.ConfigureDt)))
+                            {
+                                <a data-configBy="@row.UserId" data-subject="@row.PackageName" data-id="@row.PackageId" class="btn btn-outline-dark" id="btnReissue" data-bs-toggle="modal" data-bs-target="#reissueConfigModal">
+                                    Renew <i class="fa-sharp fa-solid fa-retweet fa-beat" style="color: #002aff;"></i>
+                                </a>
+                            }
+                            else if (row.StatusCid == 4 && (User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) && Model.user.Active && (Model.fileList.Any(x => x.StatusCid == 2)))
+                            {
+                                <button class="btn btn-outline-dark" id="btnReissue" disabled>
+                                    Expired <i class="fa-sharp fa-solid fa-trash-can-xmark fa-xs" style="color: #b30000;"></i>
+                                </button>
+                            }
+                            else if ((row.StatusCid == 4 || row.StatusCid == 3) && !(User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) && !Model.user.Active)
+                            {
+                                <a class="btn btn-warning" id="btnReissueUnauth">
+                                    Not Approved <i class="fa-sharp fa-solid fa-triangle-exclamation" style="color: #ff0000;"></i>
+                                </a>
+                            }
+                            else {
+                                <button class="btn btn-outline-dark" id="btnReissue" disabled>
+                                    Unavailable <i class="fa-sharp fa-solid fa-trash-can-xmark fa-xs" style="color: #b30000;"></i>
+                                </button>
+                            }
+
+                        }
+                        else if (row.StatusCid == 3 && !(Model.fileList.Any(x => x.ParentPkgId == row.PackageId)))
+                        {
+                            if ((User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) && Model.user.Active)
+                            {
+                                <a data-configBy="@row.UserId" data-subject="@row.PackageName" data-id="@row.PackageId" class="btn btn-outline-dark" id="btnReissue" data-bs-toggle="modal" data-bs-target="#reissueConfigModal">
+                                    Renew <i class="fa-sharp fa-solid fa-retweet fa-beat" style="color: #002aff;"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-warning" id="btnReissueUnauth">
+                                    Not Approved <i class="fa-sharp fa-solid fa-triangle-exclamation" style="color: #ff0000;"></i>
+                                </a>
+                            }
+                        }
+                        else if (row.StatusCid == 4 && !(Model.fileList.Any(x => x.ParentPkgId == row.PackageId)) && !(Model.fileList.Any(x => x.StatusCid == 2)))
+                        {
+                            if ((User.IsInRole("TAKAM-ADMINS-ROLE") || User.IsInRole("TAKAM-USERS-ROLE")) && Model.user.Active)
+                            {
+                                <a data-configBy="@row.UserId" data-subject="@row.PackageName" data-id="@row.PackageId" class="btn btn-outline-dark" id="btnReissue" data-bs-toggle="modal" data-bs-target="#reissueConfigModal">
+                                    Renew <i class="fa-sharp fa-solid fa-retweet fa-beat" style="color: #002aff;"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-warning" id="btnReissueUnauth">
+                                    Not Approved <i class="fa-sharp fa-solid fa-triangle-exclamation" style="color: #ff0000;"></i>
+                                </a>
+                            }
+                        }
+                        else if (row.StatusCid == 3 && (Model.fileList.Any(x => x.ParentPkgId == row.PackageId)))
+                        {
+                            <button class="btn btn-outline-dark" id="btnReissue" disabled>
+                                Revoked <i class="fa-sharp fa-solid fa-trash-can-xmark fa-xs" style="color: #b30000;"></i>
+                            </button>
+                        }
+                        else if (row.StatusCid == 4 && (Model.fileList.Any(x => x.StatusCid == 2)))
+                        {
+                            <button class="btn btn-outline-dark" id="btnReissue" disabled>
+                                Expired <i class="fa-sharp fa-solid fa-trash-can-xmark fa-xs" style="color: #b30000;"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <sl-tooltip content="Refresh this page in a few minutes." placement="top-end" trigger="hover">
+                                <button class="btn btn-outline-dark">
+                                    Processing <sl-spinner></sl-spinner>
+                                </button>
+                            </sl-tooltip>
+                        }
+                    </td>
+                    <td data-label="CreatedOn">@row.ConfigureDt</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="modal fade" id="reissueConfigModal" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="reissueModalTitle"><i class="fa-sharp fa-solid fa-file-check"></i> Reissue an Expired Connection Package</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="reissue-input-validation-required">
+                            <sl-select label="Certificate to Renew:" id="slselectRenewCert" value="@Model.fileList.Where(x => x.StatusCid == 3 || x.StatusCid == 4).Any() == null ? null : Model.fileList.Where(x => x.StatusCid == 3 || x.St).FirstOrDefault().ConfigId" required>
+                                @foreach (var config in Model.fileList.Where(x => x.StatusCid == 3 || x.StatusCid == 4 && x.Renewed == false))
+                                {
+                                    if (!Model.fileList.Select(x => x.ParentPkgId).ToList().Contains(config.PackageId))
+                                    {
+                                        <sl-option value="@config.PackageId">@config.PackageName</sl-option>
+                                    }
+                                }
+                            </sl-select>
+                            <br />
+                            <sl-input id="renewExpirationDt" label="Expiration Date:" placeholder="@DateTime.Today.AddDays(Int32.Parse(Configuration.GetSection("CertConfig")["CertLifetimeDays"]))" size="large" readonly filled>
+                                <i class="fa-sharp fa-regular fa-calendar-clock" slot="prefix"></i>
+                            </sl-input>
+                            <br />
+                            <sl-input id="slInputCurrUser" placeholder="@Model.user.UserName" label="Renewed by:" filled readonly>@Model.user.UserName</sl-input>
+                            <br /><br />
+                            @if ((User.IsInRole("TAKAM-USERS-ROLE") || User.IsInRole("TAKAM-ADMINS-ROLE")) && Model.user.Active)
+                            {
+                                <sl-button id=slBtnAddUser type="submit" variant="primary">Create New Connection Package</sl-button>
+                            }
+                            else
+                            {
+                                <sl-button id=slBtnUnAppr variant="warning">Not Approved</sl-button>
+                            }
+                            <br />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="newConfigModal" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title"><i class="fa-sharp fa-solid fa-user-plus"></i> Create a Connection Package</h3>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="config-input-validation-required">
+                            <sl-input id="slInputCertName" label="Filename" hidden pattern="[a-zA-Z0-9]+" help-text="Enter a team-recognizable callsign, like radio #. Symbols are not allowed."></sl-input>
+                            <sl-select hidden label="User" id=slConfigSelectUser placeholder="@Model.user.UserName" disabled help-text="Select the user this file will be available for in their dashboard">
+                            </sl-select>
+                            <sl-select hidden label="Group" id=slConfigSelectGroup value="SDSD" disabled placeholder="@Model.groupDetails.GroupName" required>
+                            </sl-select>
+                            <sl-input id="inputPackageName" placeholder="@Model.user.UserName.Split('@')[0]" size="large" readonly filled label="Filename">
+                                <i class="fa-sharp fa-regular fa-file-user" slot="prefix"></i>
+                            </sl-input>
+                            <br />
+                            <sl-input id=createExpirationDt label="Expiration Date:" placeholder="@DateTime.Today.AddDays(Int32.Parse(Configuration.GetSection("CertConfig")["CertLifetimeDays"]))" size="large" readonly filled>
+                                <i class="fa-sharp fa-regular fa-calendar-clock" slot="prefix"></i>
+                            </sl-input>
+                            <br />
+                            <sl-select hidden label="Server" id="slSelectServer" disabled placeholder="CSSA Production" required>
+                            </sl-select>
+                            <sl-input id="slInputUserNotes" placeholder="Additional Comments..." label="Notes" help-text="These will be visible only in TAKAM."></sl-input>
+                            <br />
+                            <sl-input hidden id="slInputCurrUser" placeholder="@Model.user.UserName" label="Created by" filled readonly>@Model.user.UserName</sl-input>
+                            @if ((User.IsInRole("TAKAM-USERS-ROLE") || User.IsInRole("TAKAM-ADMINS-ROLE")) && Model.user.Active)
+                            {
+                                <sl-button id=slBtnAddUser type="submit" variant="success">Create Connection Package</sl-button>
+                            }
+                            else
+                            {
+                                <sl-button id=slBtnUnAppr variant="warning">Not Approved</sl-button>
+                            }
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="userSettingsModal" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="userSettingsModalTitle">Account Info</h3>
+                        <input hidden type="text" id="currUserId" class="form-control" disabled placeholder="@Model.user.UserId" />
+                        <input hidden type="text" id="userGroupId" class="form-control" disabled value="@Model.user.PrimaryGroup" />
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Username</span>
+                            <input type="text" id="currUser" class="form-control" disabled placeholder="@Model.user.UserName" />
+                        </div>
+                        <div>
+                            <span class="input-group-text">Last Logged On</span>
+                            <input type="text" id="lastLogon" class="form-control" disabled placeholder="@Model.user.LastLogon" />
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Group</span>
+                            <input class="form-control" id="groupInput" placeholder="@Model.groupDetails.GroupName" disabled />
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Group Admin</span>
+                            <input type="text" id="isStationAdmin" class="form-control" disabled placeholder="@User.IsInRole("TAKAM-ADMINS-ROLE").ToString()" />
+                        </div>
+                        <div>
+                            <span class="input-group-text">Account Created</span>
+                            <input type="text" id="isStationAdmin" class="form-control" disabled placeholder="@Model.user.CreatedOn" />
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Agency</span>
+                            <input type="text" id="" class="form-control" disabled placeholder="San Diego Sheriff's Department" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (User.IsInRole("TAKAM-ADMINS-ROLE") && Model.user.Active)
+        {
+            <div class="modal fade" id="revokeConfigModal" role="dialog">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="revokeModalTitle"><i class="fa-sharp fa-solid fa-file-slash"></i> Revoke Connectivity for a Certificate</h4>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="revoke-validation-required">
+                                <sl-select label="Certificate to Revoke:" id=slselectRevokeCert value="@Model.fileList.Any() == null ? null : Model.configList.FirstOrDefault().ConfigId" required help-text="Only unexpired connection packages can be revoked">
+                                    @foreach (var config in @Model.fileList.Where(x => x.ExpirationDate > DateTime.Now && x.BlobPath != null))
+                                    {
+                                        <sl-option value="@config.PackageName">@config.PackageName</sl-option>
+                                    }
+                                </sl-select>
+                                <br />
+                                <sl-alert variant="warning" open>
+                                    <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+                                    <strong>This file will be revoked by all CSSA TAK Servers</strong><br />
+                                    Revoked connection packages do not allow connection to any CSSA TAK Servers. This file will no longer be downloadable in TAKAM and will be processed automatically by the TAK Server(s) within minutes. <strong>Any users with this connection package loaded in any TAK client will be immediately disconnected from the TAK server.</strong>
+                                </sl-alert>
+                                <br />
+                                <sl-checkbox value="accept" required>Accept terms and conditions above</sl-checkbox>
+                                <br />
+                                <br />
+                                <sl-input id="slRevokeInputCurrUser" placeholder="@Model.user.UserName" label="Revoked by:" filled readonly>@Model.user.UserName</sl-input>
+                                <br /><br />
+                                <sl-button id=slBtnRevoke type="submit" variant="warning">Revoke Certificate</sl-button>
+                                <br />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</body>

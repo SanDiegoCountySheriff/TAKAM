@@ -1,0 +1,37 @@
+﻿@using System.Security.Principal
+
+<div class="row d-sm-inline-flex m-auto">
+    <ul class="navbar-nav">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+
+            <li class="nav-item flex-grow-1" style="padding-left: 20px;">
+                <a class="nav-link text-dark">
+                    <sl-input variant="neutral" size="medium" title="Current User" disabled readonly placeholder="@User.Identity.Name">
+                        <i class="fa-sharp fa-solid fa-user-large" slot="prefix"></i>
+                    </sl-input>
+                </a>
+            </li>
+
+            <li class="nav-item flex-grow-1" style="padding-left: 20px;">
+                <a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">
+                    <sl-button variant="neutral" size="medium" title="Privacy">
+                        <i class="fa-sharp fa-solid fa-right-from-bracket"></i>
+                        Sign Out
+                    </sl-button>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item flex-grow-1" style="padding-left: 20px;">
+                <a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignIn">
+                    <sl-button variant="primary" size="medium" title="Privacy">
+                        <i class="fa-sharp fa-solid fa-right-to-bracket"></i>
+                        Sign In
+                    </sl-button>
+                </a>
+            </li>
+        }
+    </ul>
+</div>
