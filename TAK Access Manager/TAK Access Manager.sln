@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TAK Access Manager", "TAK Access Manager\TAK Access Manager.csproj", "{086003B8-C1F6-474A-B3E3-121C13B8CEA9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlobStorage", "BlobStorage\BlobStorage.csproj", "{8787A49C-C7BF-47D3-9494-1B0508FEC53E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{086003B8-C1F6-474A-B3E3-121C13B8CEA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{086003B8-C1F6-474A-B3E3-121C13B8CEA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{086003B8-C1F6-474A-B3E3-121C13B8CEA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{086003B8-C1F6-474A-B3E3-121C13B8CEA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8787A49C-C7BF-47D3-9494-1B0508FEC53E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8787A49C-C7BF-47D3-9494-1B0508FEC53E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8787A49C-C7BF-47D3-9494-1B0508FEC53E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8787A49C-C7BF-47D3-9494-1B0508FEC53E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D6684BD-C6C7-4CC5-A958-008945C2DE25}
+	EndGlobalSection
+EndGlobal
